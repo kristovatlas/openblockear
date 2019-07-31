@@ -115,29 +115,32 @@ function updateConfirmations() {
     'use strict';
     //console.log("DEBUG: Entered updateConfirmations()");
 
-    var divs = document.getElementsByTagName('div');
-    //console.log("DEBUG: Found " + divs.length + " divs.");
+    //https://stackoverflow.com/questions/24266313/using-foreach-on-an-array-from-getelementsbyclassname-results-in-typeerror-und
+    var divs = Array.from(document.getElementsByTagName('div'));
+    console.log("DEBUG: Found " + divs.length + " divs.");
 
-    /*jslint unparam: true*/
-    divs.forEach(function (div, index) {
-        var divId = div.getAttribute('id'),
-            txid,
-            confs,
-            newText,
-            divSelector;
-        if (divId !== null) {
-            console.log("DEBUG: Examining div: "  + divId);
-            if (divId.startsWith('tx_')) {
-                txid = divId.substring(3);
-                confs = getNumConfirmations(txid);
-                newText = "<span>" + txid + "</span> <span>&nbsp;&nbsp;&nbsp;&nbsp;</span> <span><b>" + confs + "</b> confirmations</span>";
-                divSelector = '#' + divId;
-                changeInnerHtml(divSelector, newText);
-                console.log("DEBUG: Updated div " + divId + " with "  + confs + " confirmations.");
+
+    if (divs !== null) {
+        console.log("DEBUG: typeof divs: " + typeof divs);
+        divs.forEach(function (div) {
+            var divId = div.getAttribute('id'),
+                txid,
+                confs,
+                newText,
+                divSelector;
+            if (divId !== null) {
+                console.log("DEBUG: Examining div: "  + divId);
+                if (divId.startsWith('tx_')) {
+                    txid = divId.substring(3);
+                    confs = getNumConfirmations(txid);
+                    newText = "<span>" + txid + "</span> <span>&nbsp;&nbsp;&nbsp;&nbsp;</span> <span><b>" + confs + "</b> confirmations</span>";
+                    divSelector = '#' + divId;
+                    changeInnerHtml(divSelector, newText);
+                    console.log("DEBUG: Updated div " + divId + " with "  + confs + " confirmations.");
+                }
             }
-        }
-    });
-    /*jslint unparam: false*/
+        });
+    }
 }
 
 /**
