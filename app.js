@@ -2,6 +2,55 @@
 /*jslint browser:true */
 /*global WebSocket, $ */
 
+var DEBUG = false;
+var WARN = true;
+var ERROR = true;
+var INFO = true;
+
+/**
+ * Print debug statement
+ * @param {string} msg Debug message
+ */
+function debug(msg) {
+    'use strict';
+    if (DEBUG) {
+        console.log("DEBUG: " + msg);
+    }
+}
+
+/**
+ * Print warning statement
+ * @param {string} msg Warning message
+ */
+function warn(msg) {
+    'use strict';
+    if (WARN) {
+        console.log("WARNING: " + msg);
+    }
+}
+
+/**
+ * Print info statement
+ * @param {string} msg Info message
+ */
+function info(msg) {
+    'use strict';
+    if (INFO) {
+        console.log("INFO: " + msg);
+    }
+}
+
+/**
+ * Print error statement
+ * @param {string} msg Error message
+ */
+function error(msg) {
+    'use strict';
+    if (ERROR) {
+        console.log("ERROR: " + msg);
+    }
+}
+
 /**
  * Assert condition
  * @param {boolean} condition The statement which should be true
@@ -36,7 +85,7 @@ function playCoin() {
     try {
         document.getElementById('sound').play();
     } catch (err) {
-        console.log("DEBUG: Unable to play coin:" + err);
+        error("Unable to play coin:" + err);
     }
 }
 
@@ -113,15 +162,15 @@ function changeInnerHtml(elementPath, newText) {
  */
 function updateConfirmations() {
     'use strict';
-    //console.log("DEBUG: Entered updateConfirmations()");
+    debug("Entered updateConfirmations()");
 
     //https://stackoverflow.com/questions/24266313/using-foreach-on-an-array-from-getelementsbyclassname-results-in-typeerror-und
     var divs = Array.from(document.getElementsByTagName('div'));
-    console.log("DEBUG: Found " + divs.length + " divs.");
+    debug("Found " + divs.length + " divs.");
 
 
     if (divs !== null) {
-        console.log("DEBUG: typeof divs: " + typeof divs);
+        debug("typeof divs: " + typeof divs);
         divs.forEach(function (div) {
             var divId = div.getAttribute('id'),
                 txid,
@@ -129,14 +178,14 @@ function updateConfirmations() {
                 newText,
                 divSelector;
             if (divId !== null) {
-                console.log("DEBUG: Examining div: "  + divId);
+                debug("Examining div: "  + divId);
                 if (divId.startsWith('tx_')) {
                     txid = divId.substring(3);
                     confs = getNumConfirmations(txid);
                     newText = "<span>" + txid + "</span> <span>&nbsp;&nbsp;&nbsp;&nbsp;</span> <span><b>" + confs + "</b> confirmations</span>";
                     divSelector = '#' + divId;
                     changeInnerHtml(divSelector, newText);
-                    console.log("DEBUG: Updated div " + divId + " with "  + confs + " confirmations.");
+                    debug("Updated div " + divId + " with "  + confs + " confirmations.");
                 }
             }
         });
@@ -149,7 +198,7 @@ function updateConfirmations() {
 function wsConnect() {
     'use strict';
     if (window.hasOwnProperty('WebSocket')) {
-        console.log("DEBUG: WebSocket is supported by your Browser!");
+        info("WebSocket is supported by your Browser!");
 
         // Let us open a web socket
         var ws = new WebSocket("wss://ws.blockchain.info/inv");
@@ -157,31 +206,31 @@ function wsConnect() {
 
             // Web Socket is connected, send data using send()
             ws.send('{"op":"ping"}');
-            console.log("DEBUG: PING sent...");
+            info("PING sent...");
         };
 
         ws.onmessage = function (evt) {
             var receivedMsg = evt.data;
-            console.log("DEBUG: Received ws message: " + receivedMsg);
+            debug("Received ws message: " + receivedMsg);
             if (receivedMsg === '{"op":"pong"}') {
                 // PONG received, subscribe to blocks
                 document.getElementById('status').innerHTML = 'Connected to Blockchain.com. Waiting for new blocks...';
                 ws.send('{"op":"blocks_sub"}');
-                console.log("DEBUG: Subscribed to new blocks.");
+                info("Subscribed to new blocks.");
             } else if (receivedMsg.includes('"op" : "block"')) {
-                console.log("DEBUG: New block received.");
+                info("New block received.");
                 document.getElementById('status').innerHTML = 'Block received at: ' + getTimestamp();
                 updateConfirmations();
                 playCoin();
             } else {
-                console.log("DEBUG: Unrecognized message type.");
+                warn("Unrecognized message type.");
             }
         };
 
         ws.onclose = function () {
             // websocket is closed.
-            console.log("DEBUG: Connection is closed...");
-            console.log("DEBUG: Attempting to reconnect...");
+            info("Connection is closed...");
+            info("Attempting to reconnect...");
             ws = new WebSocket("wss://ws.blockchain.info/inv");
         };
     } else {
