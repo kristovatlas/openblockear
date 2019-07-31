@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<!--Play mario coin wav whenever new block is found-->
+<html>
+  <head>
+    <title>Open Block Ear</title>
+    <script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+  </head>
+  <body onload="javascript:wsConnect();">
+    <noscript><b>Error: JavaScript is disabled in your browser.</b></noscript>
+    <div id="statusmessage">
+      <span><b>Status: </b></span>
+      <span style="font-style:italic" id="status">Connecting to blockchain.com block data...</span>
+    </div>
+    <hr/>
+    <div>
+      Note: You must press "play" once to allow this tab to play the sound noise when blocks are found.
+    </div>
+    <hr/>
+    <div>
+      <audio controls id="sound">
+          <source src="coin.wav" type="audio/mpeg">
+          <p><b>Error: Browser doesn't support html5</b></p>
+      </audio>
+    </div>
+    <div id="top"></div>
+    <div id="bottom"></div>
+    <div id="add_button_div">
+      <input type="button" value="Click here to add a BTC transaction ID to watch" id="add_button" onclick="addTransactionRow()" />
+    </div>
+    <!--div><input type="button" value="DEBUG update" onclick="updateConfirmations()"></div-->
+  </body>
+</html>
